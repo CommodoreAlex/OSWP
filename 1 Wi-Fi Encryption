@@ -1,0 +1,48 @@
+OSWP Notes:
+
+
+Mesh Peering Management (MPM): Unsecure peering
+- Unencrypted and rogue stations may hijack connections.
+
+Authenticated Mesh Peering Exchange (AMPE): Secure peering.
+- Use's simultaneous authentication of equals (SAE) or 802.1x to exchange encryption keys.
+
+To see other Wi-Fi networks we require monitoring mode for our wireless card to be enabled,
+this allows us to capture 802.11 frames and allow packet injection.
+
+Wi-Fi Encryption-----
+
+Wired Equivalent Privacy (WEP) can be cracked in under a minute.
+
+Wi-Fi Protected Access (WPA)
+
+Wi-Fi Protected Access 2 (WPA2)
+
+Wi-Fi Protected Setup (WPS)
+
+WPA3 (2018)
+- Uses forward secrecy, using a Dragonfly handshake with SAE.
+- Simplify process of configuring devices with no display such as IoT
+- A new 192-bit mode for eneterprise networks with stronger cipher suites.
+- Mandatory use of protected management frames (PMF)
+
+Opportunistic Wireless Encryption (OWE) also known as "Enhanced Opened" adds encryption to public Wi-Fi networks.
+
+Open networks do not involve any encryption so anyone running a wireless sniffer can see the traffic "as is".
+This process of connecting to the network is as follows:
+
+The client sends an authentication request to the AP
+The AP sends an authentication response of "successful"
+The STA sends an association request to the access point
+The AP sends an association response if the capability of the clients meets that of the AP
+
+WPA encryption comes in two flavors:
+
+WPA Personal: Makes use of pre-shared key authentication (WPA-PSK), a passphrase shared by all peers of the network.
+WPA Enterprise: Uses 802.1X and a Radius server for Authentication, Authorization, and Accounting (AAA).
+
+Without 802.11w when sending a DeAuth, the AP or one or all clients blindly accepts it and disconnects.
+
+In most cases the client will reconnect automatically without the user knowing. A 4 way handshake will happen,
+which can later be cracked offline. It is also useful for attacks against WEP.
+
