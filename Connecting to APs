@@ -1,0 +1,25 @@
+# Connecting to an access point.
+# WPA Supplicant can be used with CLI or with configuration files containing the settings of the network
+# Sample Configuration files
+
+
+# Sample WPA_Supplicant for open network (no password)
+network={
+	ssid="SSID_HERE"
+	scan_ssid=1
+}
+
+# Sample WPA_Supplicant for WPA or WPA2-PSK network (password protected)
+network={
+  ssid="SSID_HERE"
+  scan_ssid=1
+  psk="correct battery horse staple"
+  key_mgmt=WPA-PSK
+}
+
+# Using the example above listing for WPA/WPA2-PSKK
+# Use the correct interface and create a file with the contents above:
+sudo wpa-supplicant -i wlan0 -c wifi-client.conf
+
+# Then request a DHCP lease using dhclient on the same interface
+sudo dhclient wlan0
