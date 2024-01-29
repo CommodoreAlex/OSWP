@@ -1,5 +1,0 @@
-for channel in 1 6 11 2 7 10 3 8 4 9 5
-do
-  iw dev wlan0mon set channel ${channel}
-  sleep 1
-done
